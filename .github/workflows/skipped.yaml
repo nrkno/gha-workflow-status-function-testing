@@ -1,4 +1,4 @@
-name: "Test behaviour of success()"
+name: "When a single job is skipped, what do the job status check functions do?"
 
 on: push
 
@@ -9,18 +9,11 @@ jobs:
     steps:
       - shell: bash
         run: echo "This job will always be skipped"
-  always-success:
-    runs-on: ubuntu-latest
-    if: true
-    steps:
-      - shell: bash
-        run: echo "This job will always succeed"
 
   runs-upon-success:
     runs-on: ubuntu-latest
     needs:
       - always-skipped
-      - always-success
     if: success()
     steps:
       - shell: bash
@@ -29,7 +22,6 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - always-skipped
-      - always-success
     if: "!(failure() || cancelled())"
     steps:
       - shell: bash
@@ -38,7 +30,6 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - always-skipped
-      - always-success
     if: cancelled()
     steps:
       - shell: bash
@@ -47,7 +38,6 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - always-skipped
-      - always-success
     if: failure()
     steps:
       - shell: bash

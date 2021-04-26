@@ -1,0 +1,56 @@
+name: "When one job fails and another one skipped, what do the status check functions do?"
+
+on: push
+
+jobs:
+  always-skipped:
+    runs-on: ubuntu-latest
+    if: false
+    steps:
+      - shell: bash
+        run: echo "This job will always be skipped"
+  always-failure:
+    runs-on: ubuntu-latest
+    if: true
+    steps:
+      - shell: bash
+        run: |
+          echo "This job will always fail"
+          exit 1
+
+  runs-upon-success:
+    runs-on: ubuntu-latest
+    needs:
+      - always-skipped
+      - always-failure
+    if: success()
+    steps:
+      - shell: bash
+        run: echo "This job should run when no job has failed or been cancelled"
+  runs-upon-no-failure:
+    runs-on: ubuntu-latest
+    needs:
+      - always-skipped
+      - always-failure
+    if: "!(failure() || cancelled())"
+    steps:
+      - shell: bash
+        run: echo "This job should run when no job has failed or been cancelled"
+  runs-upon-cancellation:
+    runs-on: ubuntu-latest
+    needs:
+      - always-skipped
+      - always-failure
+    if: cancelled()
+    steps:
+      - shell: bash
+        run: echo "This job should run when the workflow has been cancelled"
+  runs-upon-failure:
+    runs-on: ubuntu-latest
+    needs:
+      - always-skipped
+      - always-failure
+    if: failure()
+    steps:
+      - shell: bash
+        run: echo "This job should run when any of the previous jobs have failed"
